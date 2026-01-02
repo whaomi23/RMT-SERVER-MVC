@@ -270,5 +270,7 @@ Para preguntas o soporte, por favor abre un issue en el repositorio.
 
 ---
 
-**Desarrollado con ❤️ usando C# y ASP.NET Core**
+**Desarrollado con ❤️ usando C# y ASP.NET Core** 
+
+POC: https://youtube.com/shorts/uX74JGtfTo4?si=usfjljjy3jNKRO8M 
 
