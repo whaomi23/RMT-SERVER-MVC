@@ -1,0 +1,158 @@
+@{
+    ViewData["Title"] = "Monitoreo Remoto";
+}
+
+<div class="container mt-4">
+    <h2>Monitoreo Remoto</h2>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Vista Remota</h5>
+                </div>
+                <div class="card-body">
+                    <div id="remoteScreen" class="text-center">
+                        <img id="screenImage" src="" alt="Pantalla Remota" class="img-fluid" style="max-width: 100%;" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Controles</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <button id="startMonitor" class="btn btn-success">Iniciar Monitoreo</button>
+                        <button id="stopMonitor" class="btn btn-danger">Detener Monitoreo</button>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="intervalInput" class="form-label">Intervalo de Captura (ms)</label>
+                        <input type="number" class="form-control" id="intervalInput" value="1000" min="100" step="100">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="qualityInput" class="form-label">Calidad de Imagen (%)</label>
+                        <input type="range" class="form-range" id="qualityInput" min="1" max="100" value="70">
+                        <span id="qualityValue">70%</span>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="autoRefresh" checked>
+                            <label class="form-check-label" for="autoRefresh">
+                                Actualización Automática
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let refreshInterval;
+        let isMonitoring = false;
+        
+        $(document).ready(function() {
+            // Inicializar controles
+            $('#qualityInput').on('input', function() {
+                $('#qualityValue').text($(this).val() + '%');
+            });
+            
+            // Control de monitoreo
+            $('#startMonitor').click(function() {
+                startMonitoring();
+            });
+            
+            $('#stopMonitor').click(function() {
+                stopMonitoring();
+            });
+            
+            // Configuración de intervalo
+            $('#intervalInput').change(function() {
+                if (isMonitoring) {
+                    updateInterval();
+                }
+            });
+            
+            // Configuración de calidad
+            $('#qualityInput').change(function() {
+                if (isMonitoring) {
+                    updateQuality();
+                }
+            });
+        });
+        
+        function startMonitoring() {
+            $.post('/api/RemoteMonitor/start-monitoring', function(response) {
+                isMonitoring = true;
+                $('#startMonitor').prop('disabled', true);
+                $('#stopMonitor').prop('disabled', false);
+                startAutoRefresh();
+            });
+        }
+        
+        function stopMonitoring() {
+            $.post('/api/RemoteMonitor/stop-monitoring', function(response) {
+                isMonitoring = false;
+                $('#startMonitor').prop('disabled', false);
+                $('#stopMonitor').prop('disabled', true);
+                stopAutoRefresh();
+            });
+        }
+        
+        function updateInterval() {
+            const interval = $('#intervalInput').val();
+            $.post('/api/RemoteMonitor/set-interval', interval, function(response) {
+                if (isMonitoring) {
+                    stopAutoRefresh();
+                    startAutoRefresh();
+                }
+            });
+        }
+        
+        function updateQuality() {
+            const quality = $('#qualityInput').val();
+            $.post('/api/RemoteMonitor/set-quality', quality, function(response) {
+                // La calidad se actualizará en la próxima captura
+            });
+        }
+        
+        function startAutoRefresh() {
+            if ($('#autoRefresh').is(':checked')) {
+                const interval = $('#intervalInput').val();
+                refreshInterval = setInterval(updateScreen, interval);
+            }
+        }
+        
+        function stopAutoRefresh() {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+        }
+        
+        function updateScreen() {
+            if (isMonitoring) {
+                const timestamp = new Date().getTime();
+                $('#screenImage').attr('src', `/frames/frame_${timestamp}.jpg?t=${timestamp}`);
+            }
+        }
+        
+        // Inicializar estado
+        $.get('/api/RemoteMonitor/monitor-status', function(response) {
+            if (response.isActive) {
+                isMonitoring = true;
+                $('#startMonitor').prop('disabled', true);
+                $('#stopMonitor').prop('disabled', false);
+                startAutoRefresh();
+            }
+        });
+    </script>
+} 

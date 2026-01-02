@@ -1,0 +1,2763 @@
+﻿@model List<RMT_SERVER_MVC.Models.ClientModel>
+
+@{
+    ViewBag.Title = "Clientes Conectados";
+}
+
+@functions {
+    public string GetCountryCode(string countryName)
+    {
+        // Diccionario simplificado de países a códigos ISO
+        var countryCodes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            {"United States", "us"},
+            {"Mexico", "mx"},
+            {"Spain", "es"},
+            {"Argentina", "ar"},
+            {"Colombia", "co"},
+            {"Chile", "cl"},
+            {"Peru", "pe"},
+            {"Brazil", "br"},
+            {"France", "fr"},
+            {"Germany", "de"},
+            {"Italy", "it"},
+            {"United Kingdom", "gb"},
+            {"Russia", "ru"},
+            {"China", "cn"},
+            {"Japan", "jp"},
+            // Agrega más países según necesites
+        };
+
+        if (countryName != null && countryCodes.TryGetValue(countryName, out var code))
+        {
+            return code;
+        }
+
+        return "unknown"; // Opcional: usa una bandera genérica o deja vacío
+    }
+
+    public string GetMachine(string maquina)
+    {
+        if (string.IsNullOrEmpty(maquina))
+            return "img/PC/PC.png"; // Imagen por defecto si no hay datos
+
+        // Retorna la URL de la imagen según el sistema operativo
+        if (maquina.Contains("", StringComparison.OrdinalIgnoreCase))
+            return "img/PC/PC.png";
+
+        return "img/PC/PC.png"; // Imagen por defecto
+    }
+
+    public string GetShowIPImage(string ipAddress)
+    {
+        if (string.IsNullOrEmpty(ipAddress))
+            return "img/IP/IP.png"; // Imagen por defecto si no hay datos
+
+        // Retorna la URL de la imagen según condiciones específicas
+        return "img/IP/IP.png"; // Imagen de red por defecto
+    }
+
+
+    public string GetOSImage(string osName)
+    {
+        if (string.IsNullOrEmpty(osName))
+            return "img/OS/XD.gif"; // Imagen por defecto si no hay datos
+
+        // Retorna la URL de la imagen según el sistema operativo
+        if (osName.Contains("Windows 7", StringComparison.OrdinalIgnoreCase))
+            return "/img/OS/Windows7.png";
+
+        // Retorna la URL de la imagen según el sistema operativo
+        if (osName.Contains("Windows 8", StringComparison.OrdinalIgnoreCase))
+            return "/img/OS/Windows8.png";
+
+        // Retorna la URL de la imagen según el sistema operativo
+        if (osName.Contains("Windows 8.1", StringComparison.OrdinalIgnoreCase))
+            return "/img/OS/Windows8.png";
+
+        // Retorna la URL de la imagen según el sistema operativo
+        if (osName.Contains("Windows 11", StringComparison.OrdinalIgnoreCase))
+            return "/img/OS/Windows11.png";
+
+        if (osName.Contains("Windows 10", StringComparison.OrdinalIgnoreCase))
+            return "/img/OS/Windows10.png";
+
+        return "img/OS/XD.gif"; // Imagen por defecto
+    }
+
+
+
+
+    public string GetAntivirus(string Antuvirus)
+    {
+        if (string.IsNullOrEmpty(Antuvirus))
+            return "img/OS/XD.gif"; // Imagen por defecto si no hay datos
+
+        // Retorna la URL de la imagen según el antivirus
+        if (Antuvirus.Contains("Windows Defender", StringComparison.OrdinalIgnoreCase))
+            return "/img/Security/Windows Defender.png";
+
+        // Retorna la URL de la imagen según el antivirus
+        if (Antuvirus.Contains("Windows 8", StringComparison.OrdinalIgnoreCase))
+            return "/img/OS/Windows8.png";
+
+        // Retorna la URL de la imagen según el antivirus
+        if (Antuvirus.Contains("Windows 8.1", StringComparison.OrdinalIgnoreCase))
+            return "/img/OS/Windows8.png";
+
+        // Retorna la URL de la imagen según el antivirus
+        if (Antuvirus.Contains("Windows 11", StringComparison.OrdinalIgnoreCase))
+            return "/img/OS/Windows11.png";
+
+        if (Antuvirus.Contains("Windows 10", StringComparison.OrdinalIgnoreCase))
+            return "/img/OS/Windows10.png";
+
+        return "img/OS/XD.gif"; // Imagen por defecto
+    }
+
+    public string GetRam(string ram)
+    {
+        if (string.IsNullOrEmpty(ram))
+            return "img/RAM/RAM.png"; // Imagen por defecto si no hay datos
+
+        // Retorna la URL de la imagen según el sistema operativo
+        if (ram.Contains("", StringComparison.OrdinalIgnoreCase))
+            return "img/RAM/RAM.png";
+
+        return "img/RAM/RAM.png"; // Imagen por defecto
+    }
+
+    public string GetArchImage(string architecture)
+    {
+        if (string.IsNullOrEmpty(architecture))
+            return "img/ARCH/ARCH.gif"; // Imagen por defecto si no hay datos
+  
+        if (architecture.Contains("", StringComparison.OrdinalIgnoreCase))
+            return "img/ARCH/ARCH.gif";
+
+        // Agrega más arquitecturas según sea necesario
+        return "img/ARCH/ARCH.gif"; // Imagen por defecto
+    }
+
+
+    public string GetOptions(string options)
+    {
+        if (string.IsNullOrEmpty(options))
+            return "img/OPTIONS/option.png"; // Imagen por defecto si no hay datos
+
+        if (options.Contains("", StringComparison.OrdinalIgnoreCase))
+            return "img/OPTIONS/option.png";
+
+        // Agrega más arquitecturas según sea necesario
+        return "img/OPTIONS/option.png"; // Imagen por defecto
+    }
+
+    public string UserName(string usernamePC)
+    {
+        if (string.IsNullOrEmpty(usernamePC))
+            return "img/USER/user1.png"; // Imagen por defecto si no hay datos
+
+        if (usernamePC.Contains("", StringComparison.OrdinalIgnoreCase))
+            return "img/USER/user2.jpg";
+
+        // Agrega más arquitecturas según sea necesario
+        return "img/USER/user1.png"; // Imagen por defecto
+    }
+
+    public string GetScreenshotPath(string machineName, string fileName)
+    {
+        if (string.IsNullOrEmpty(machineName) || string.IsNullOrEmpty(fileName))
+            return Url.Content("~/img/default-screenshot.png"); // Ruta de imagen por defecto
+
+        return Url.Content($"Ankle Boots/Clientes/{machineName}/screenshots/{fileName}");
+    }
+
+    public string GetBuilderCommand(string solutionPath, string configuration, string platform)
+    {
+        var startInfo = new System.Diagnostics.ProcessStartInfo
+        {
+            FileName = "Cm.exe",
+            Arguments = $"-path=\"{solutionPath}\" -c {configuration} -p \"{platform}\"",
+            UseShellExecute = false,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            CreateNoWindow = true
+        };
+
+        try
+        {
+            using (var process = System.Diagnostics.Process.Start(startInfo))
+            {
+                process.WaitForExit();
+                return process.StandardOutput.ReadToEnd();
+            }
+        }
+        catch (Exception ex)
+        {
+            return $"Error al ejecutar Cm.exe: {ex.Message}";
+        }
+    }
+}
+
+<head>
+    <!-- Font Awesome 4 (fa fa-*) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- Font Awesome 5/6 (fas fa-*, far fa-*, fab fa-*) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Otras librerías -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css">
+
+</head>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Clientes Conectados</h2>
+    <button id="reloadButton" class="btn btn-primary" style="background: linear-gradient(135deg, rgba(26, 26, 46, 0.6) 0%, rgba(22, 33, 62, 0.6) 50%, rgba(15, 52, 96, 0.6) 100%); border: none;">
+        <i class="fa fa-refresh"></i> Recargar
+    </button>
+</div>
+
+<!-- Monitor decorativo -->
+<div class="monitor-container mb-4">
+    <div class="monitor">
+        <div class="monitor-screen">
+            <div class="screen-content">
+                <img id="monitorScreenshot" 
+                     src="@(Model.Count > 0 ? GetScreenshotPath(Model[0].MachineName, Model[0].Screenshot?.FileName) : "/img/default-screenshot.png")" 
+                     alt="Captura de pantalla"
+                     class="monitor-image" />
+            </div>
+        </div>
+        <div class="monitor-stand">
+            <div class="monitor-base"></div>
+        </div>
+    </div>
+</div>
+
+<br />
+<div class="row">
+    <div class="col-md-12">
+        <div class="table-responsive">
+            <table class="table text-center ">
+                <thead class="bg-black text-white">
+                    <tr>
+                        <th>Máquina</th>
+                        <th>IP</th>
+                        <th>Usuario</th>
+                        <th>OS</th>
+                        <th>Arch</th>
+                        <th>Antivirus</th>
+                        <th>Virtual?</th>
+                        <th>Pais</th>
+                        <th>CPU</th>
+                        <th>RAM</th>
+                        <th>DRIVES</th>
+                        <th>Última Conexión</th>
+                        <th>Estado</th>
+                        <th>Captura</th>
+                        <th>Acciones</th>
+                        <th>Upload</th> <!-- Nueva columna -->
+                        <th>File Manager</th>
+                        <th>Streaming</th>
+                        <th>Opciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var client in Model)
+                    {
+                        var machineName = client.MachineName;
+                        <tr data-client-id="@client.Id">
+                            <td>
+                                <div class="checkbox-container">
+                                    <img src="@GetMachine(client.MachineName)" 
+                                         alt="@client.MachineName" 
+                                         style="max-width: 24px; max-height: 24px; cursor: pointer;" 
+                                         class="machine-image"
+                                         data-client-id="@client.Id"
+                                         data-machine-name="@machineName" />
+                                    <hr />
+                                    @machineName
+                                </div>
+                                <div class="context-menu" id="context-menu-@client.Id">
+                                    <div class="context-menu-item" data-command="OFF">
+                                        <i class="fa fa-power-off"></i> Apagar
+                                    </div>
+                                        <div class="context-menu-item" data-command="RESTART">
+                                        <i class="fa fa-refresh"></i> Reiniciar
+                                    </div>
+                                    <div class="context-menu-item" data-command="LOCK">
+                                        <i class="fa fa-lock"></i> Bloquear
+                                    </div>
+                                    <div class="context-menu-item" data-command="CLOSE-SESSION">
+                                        <i class="fa fa-sign-out"></i> Cerrar sesión
+                                    </div>
+                                    <div class="context-menu-item" data-command="SLEEP">
+                                        <i class="fa fa-bed"></i> Suspender
+                                    </div>
+                                    <div class="context-menu-item" data-command="KILL-CLIENT">
+                                         <i class="fa fa-remove"></i> Kill
+                                     <div>
+                                </div>
+                            </td>
+                            <td>
+								<div class="checkbox-container">
+                                    <img src="@UserName(client.UserName)" alt="IP" style="max-width: 20px; max-height: 20px;" />
+                                    <hr />
+									@client.UserName
+								</div>
+                            </td>
+                                <td>
+                                    <div class="checkbox-container">
+                                        <img src="@GetShowIPImage(client.IPAddress)" alt="IP" style="max-width: 20px; max-height: 20px;" />
+                                        <hr />
+                                        @client.IPAddress
+                                    </div>
+                                </td>
+
+                            <td>
+                                <div class="checkbox-container">
+                                        <img src="@GetOSImage(client.OSVersion)" alt="@client.OSVersion" style="max-width: 24px; max-height: 24px;" />
+                                  
+                                        @client.OSVersion
+                                </div>
+                             </td>
+                            <td>
+                                    <div class="checkbox-container">
+                                    <img src="@GetArchImage(client.OSArchitecture)" alt="@client.OSArchitecture" style="max-width: 20px; max-height: 20px;" />
+                                    <hr />
+                                    @client.OSArchitecture
+                                </div>  
+                            </td>
+                            <td>
+                                <div class="checkbox-container">
+                                    <img src="@GetAntivirus(client.Antivirus)" 
+                                         alt="@client.Antivirus" 
+                                         style="max-width: 24px; max-height: 24px; cursor: pointer;" 
+                                         class="antivirus-image"
+                                         data-client-id="@client.Id"
+                                         data-machine-name="@machineName" />
+                                    <hr />
+                                    @client.Antivirus
+                                </div>
+                            <!---->
+                                <!-- Opcion 1 -->
+                                <div class="context-menu" id="antivirus-menu-@client.Id">
+                                    <div class="context-menu-item" id="antivirus-menu-@client.Id">
+                                            <i class="fa-solid fa-shield" style="color:dodgerblue;"></i> Antivirus Opciones >
+                                        <div class="submenu">
+                                             <div class="context-menu-item" data-command="antivirus-enable">
+                                                <i class="fa fa-check-circle" style="color:chartreuse;"></i> Activar Antivirus
+                                             </div>
+                                             <div class="context-menu-item" data-command="antivirus-disable">
+                                                <i class="fa fa-ban" style="color:red;"></i> Desactivar Antivirus
+                                              </div>
+                                        </div>
+                                    </div>
+                                    <!---->
+
+                                    <!-- Opcion 2 -->
+                                        <div class="context-menu-item" id="antivirus-menu-@client.Id">
+                                            <i class="">&#128293;</i> Firewall Opciones >
+                                            <div class="submenu">
+                                                <div class="context-menu-item" data-command="FIREWALL-STATUS">
+                                                    <i class="fa fa-info-circle" style="color:orange:"></i> Firewall Check
+                                                </div>
+                                                <div class="context-menu-item" data-command="FIREWALL-ON">
+                                                    <i class="fa fa-check-circle" style="color:chartreuse;" ></i> Activar Firewall
+                                                </div>
+                                                <div class="context-menu-item" data-command="FIREWALL-OFF">
+                                                    <i class="fa fa-ban" style="color:red;"></i> Desactivar Firewalll
+                                                </div>
+                                            </div>
+                                        </div>
+                                     <!---->
+                                </div>
+                            <!---->
+                            </td>                       
+                            <td>@client.IsVirtualMachine</td>
+                            <td>
+                                    <span class="flag-icon flag-icon-@GetCountryCode(client.Country)"
+                                          title="@client.Country"></span>
+                                    @client.Country
+                            </td>
+                            <td>@client.CPU</td>
+                            <td>
+                                <img src="@GetRam(client.RAM)" alt="@client.RAM" style="max-width: 24px; max-height: 24px;" />
+                                    <hr />
+                                @client.RAM
+                            </td>
+                            <td>@client.Drives</td>
+                            <td>@client.LastConnection.ToString("g")</td>
+                            <td>
+                                <span class="label @(client.IsOnline ? "label-success" : "label-danger")">
+                                    @(client.IsOnline ? "ONLINE" : "OFFLINE")
+                                </span>
+                            </td>
+                            <td>
+                                
+                                    <img src="@GetScreenshotPath(client.MachineName, client.Screenshot?.FileName)?@DateTime.Now.Ticks"
+                                         data-fullsrc="@GetScreenshotPath(client.MachineName, client.Screenshot?.FileName)?@DateTime.Now.Ticks"
+                                         style="max-width: 150px; max-height: 100px; cursor: pointer;"
+                                         class="img-thumbnail screenshot-img"
+                                         alt="Captura de @machineName"
+                                         data-client-id="@client.Id" />
+
+                            </td>
+                            <td>
+                                <button class="btn btn-warning btn-xs open-cmd-modal"
+                                        data-client-id="@client.Id"
+                                        data-machine-name="@machineName">
+                                    <i class="fa fa-terminal"></i>
+                                </button>
+
+                                <button class="btn btn-info btn-xs view-results"
+                                        data-client-id="@client.Id"
+                                        data-machine-name="@machineName">
+                                    <i class="fa fa-list-alt"></i> (@(client.CommandResults?.Count ?? 0))
+                                </button>
+                            </td>
+                            <td>
+                                <button class="btn btn-success btn-xs transfer-file"
+                                        data-client-id="@client.Id"
+                                        data-machine-name="@machineName">
+                                    <i class="fa fa-upload"></i>
+                                </button>
+                            </td>
+                            <td>
+                                <button class="btn btn-primary btn-xs open-file-manager"
+                                        data-client-id="@client.Id"
+                                        data-machine-name="@machineName">
+                                    <i class="fa fa-folder-open"></i>
+                                </button>
+                            </td>
+                            <td>
+                                @* <button class="btn btn-success btn-xs start-stream" *@
+                                @*         data-client-id="@client.Id" *@
+                                @*         data-machine-name="@machineName"> *@
+                                @*     <i class="fa fa-video-camera"></i> *@
+                                @* </button> *@
+
+                                <div class="container mt-5">
+                                    <!-- Botón para abrir el modal -->
+                                    <button type="button" class="btn btn-success btn-xs" data-bs-toggle="modal" data-bs-target="#monitorModal">
+                                        <i class="fas fa-tv me-2"></i>
+                                    </button>
+                                </div>
+
+                            </td>
+                            <td>
+                                <div class="checkbox-container">
+                                    <i class="fa-solid fa-option"></i>
+                                    <img src="@GetOptions(client.Id)"
+                                         alt="Opciones" 
+                                         style="max-width: 24px; max-height: 24px; cursor: pointer;" 
+                                         class="options-image"
+                                         data-client-id="@client.Id"
+                                         data-machine-name="@machineName" />
+                                    <hr />
+                                </div>
+                                <div class="context-menu" id="options-menu-@client.Id">
+                                    <div class="context-menu-item" data-action="open-file-manager">
+                                        <i class="fa fa-folder-open"></i> File Manager
+                                    </div>
+                                    <div class="context-menu-item" data-action="open-file-transfer">
+                                        <i class="fa fa-upload"></i> Transferir Archivos
+                                    </div>
+                                    <div class="context-menu-item" data-action="open-terminal">
+                                        <i class="fa fa-terminal"></i> Terminal Remoto
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+           </div>
+    </div>
+</div>
+
+<!-- LinkLabel para Builder -->
+<div class="position-fixed bottom-0 start-0 p-3">
+    <a href="#" class="text-decoration-none" data-bs-toggle="modal" data-bs-target="#builderModal">
+        <i class="fas fa-code me-2"></i>Builder
+    </a>
+</div>
+
+<!-- Modal del Builder -->
+<div class="modal fade" id="builderModal" tabindex="-1" aria-labelledby="builderModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="builderModalLabel">
+                    <i class="fas fa-code me-2"></i>Builder
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="builderForm">
+                    <div class="mb-3">
+                        <label for="solutionPath" class="form-label">Ruta de la Solución</label>
+                        <input type="text" class="form-control" id="solutionPath" value="C:\proyectos\mi-solucion.sln">
+                    </div>
+                    <div class="mb-3">
+                        <label for="configuration" class="form-label">Configuración</label>
+                        <select class="form-select" id="configuration">
+                            <option value="Release">Release</option>
+                            <option value="Debug">Debug</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="platform" class="form-label">Plataforma</label>
+                        <select class="form-select" id="platform">
+                            <option value="Any CPU">Any CPU</option>
+                            <option value="x64">x64</option>
+                            <option value="x86">x86</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="executeBuilder">
+                    <i class="fas fa-play me-2"></i>Ejecutar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="cmdModal" tabindex="-1" role="dialog" aria-labelledby="cmdModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-cmd" role="document">
+        <div class="modal-content cmd-modal-content">
+            <div class="modal-header cmd-header d-flex justify-content-between align-items-center">
+                <h4 class="modal-title" id="cmdModalLabel" style="flex-grow: 1; text-align: center;">
+                    <i class="fa fa-terminal"></i>
+                    <span id="cmdMachineName"></span> - Terminal Remoto
+                </h4>
+                <button type="button" class="btn btn-danger" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body cmd-body">
+                <div class="cmd-history" id="cmdHistory"></div>
+                <div class="cmd-input-container">
+                    <span class="cmd-prompt">C:\></span>
+                    <input type="text" class="cmd-input" id="cmdInput" autocomplete="off">
+
+                </div>
+            </div>
+            <div class="modal-footer cmd-footer">
+                <small class="text-muted">Presiona Enter para ejecutar, ESC para salir</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para transferencia de archivos -->
+<div class="modal fade" id="fileTransferModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Enviar Archivo a <span id="fileTransferMachineName"></span></h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Seleccionar archivo:</label>
+                    <input type="file" id="fileToTransfer" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Ruta de destino en cliente:</label>
+                    <input type="text" id="destinationPath" class="form-control" value="C:\Temp\" readonly>
+                </div>
+                <div class="progress" style="display: none;" id="uploadProgress">
+                    <div class="progress-bar progress-bar-striped active" role="progressbar" style="width: 0%">
+                        <span class="sr-only">0% completado</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="btnStartTransfer">
+                    <i class="fa fa-upload"></i> Enviar
+                </button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para el File Manager -->
+<div class="modal fade" id="fileManagerModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">
+                    <i class="fa fa-folder-open"></i>
+                    File Manager - <span id="fileManagerMachineName"></span>
+                </h4>
+                <div class="input-group">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" id="btnBack" disabled>
+                            <i class="fa fa-arrow-left"></i>
+                        </button>
+                        <button class="btn btn-default" id="btnForward" disabled>
+                            <i class="fa fa-arrow-right"></i>
+                        </button>
+                    </span>
+                    <input type="text" class="form-control" id="currentPath" value="C:\" placeholder="">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" id="btnRefresh">
+                            <i class="fa fa-refresh"></i>
+                        </button>
+                    </span>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="file-manager-container">
+                    <div class="file-manager-breadcrumb">
+                        <ol class="breadcrumb" id="fileManagerBreadcrumb">
+                            <li><a href="#" data-path="C:\">C:\</a></li>
+                        </ol>
+                    </div>
+                    <div class="file-manager-content">
+                        <table class="table table-condensed table-hover" id="fileManagerTable">
+                            <thead class="text-black">
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Tipo</th>
+                                    <th>Tamaño</th>
+                                    <th>Modificado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="fileManagerTableBody"  class="text-black">
+                                <!-- Aquí se cargarán los archivos y directorios -->
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal centrado para mostrar la captura -->
+<div class="modal fade" id="screenshotModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen" role="document">
+        <div class="modal-content bg-dark border-0 d-flex justify-content-center align-items-center p-0" style="min-height: 100vh;">
+            <button type="button"
+                    class="btn-close position-absolute top-0 end-0 m-3"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar"
+                    style="z-index: 1056; filter: invert(1); font-size: 2rem;">
+            </button>
+
+            <div class="w-100 text-center d-flex justify-content-center align-items-center">
+                <img id="fullScreenshot"
+                     src=""
+                     alt="Captura completa"
+                     class="img-fluid rounded shadow"
+                     style="max-width: 180vh; max-height: 95vh; object-fit: contain;" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@* <div class="modal fade" id="streamModal" tabindex="-1" role="dialog" aria-hidden="true"> *@
+@*     <div class="modal-dialog modal-fullscreen" role="document"> *@
+@*         <div class="modal-content bg-dark border-0 d-flex justify-content-center align-items-center p-0" style="min-height: 100vh;"> *@
+@*             <button type="button" *@
+@*                     class="btn-close position-absolute top-0 end-0 m-3" *@
+@*                     data-bs-dismiss="modal" *@
+@*                     aria-label="Cerrar" *@
+@*                     style="z-index: 1056; filter: invert(1); font-size: 2rem;"> *@
+@*             </button> *@
+
+@*             <div class="w-100 text-center d-flex justify-content-center align-items-center" style="min-height: 100vh; background-color: #000;"> *@
+@*                 <img id="streamImage" *@
+@*                      src="" *@
+@*                      alt="Streaming en tiempo real" *@
+@*                      class="img-fluid rounded shadow" *@
+@*                      style="max-width: 100%; max-height: 100vh; object-fit: contain; display: none;" /> *@
+@*             </div> *@
+@*         </div> *@
+@*     </div> *@
+@* </div> *@
+
+
+
+<!-- Modal para el monitor - Agregado backdrop: 'static' y keyboard: false -->
+<div class="modal fade" id="monitorModal" tabindex="-1" aria-labelledby="monitorModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content bg-dark border-0" style="min-height: 100vh;" id="draggableModal">
+            <!-- Barra de controles superior -->
+            <div class="modal-header draggable-handle position-absolute top-0 start-0 end-0 p-2" style="z-index: 1056; cursor: move;">
+                <!-- Botón de Picture-in-Picture -->
+                <button id="pipButton" class="btn btn-sm btn-secondary ms-2">
+                    <i class="fas fa-expand"></i>
+                </button>
+
+                <!-- Botón de redimensionar (solo visible en modo PIP) -->
+                <button id="resizeButton" class="btn btn-sm btn-secondary ms-2 d-none">
+                    <i class="fas fa-vector-square"></i>
+                </button>
+
+                <!-- Botón de cerrar -->
+                <button type="button"
+                        class="btn-close btn-close-white ms-auto"
+                        data-bs-dismiss="modal"
+                        aria-label="Cerrar"
+                        style="font-size: 1rem;">
+                </button>
+            </div>
+
+            <!-- Controles flotantes con iconos -->
+            <div class="position-absolute top-0 start-0 m-3 d-flex gap-3" style="z-index: 1055; margin-top: 60px !important;">
+                <button id="startMonitorBtn" class="btn btn-streaming">
+                    <i class="fas fa-play-circle me-2"></i><span class="btn-text">Iniciar</span>
+                </button>
+                <button id="stopMonitorBtn" class="btn btn-streaming" disabled>
+                    <i class="fas fa-stop-circle me-2"></i><span class="btn-text">Detener</span>
+                </button>
+                <div id="statusIndicator" class="status-badge">
+                    <i class="fas fa-circle-notch fa-spin me-2"></i><span>Inactivo</span>
+                </div>
+            </div>
+
+            <!-- Contenedor principal de la imagen -->
+            <div class="w-100 text-center d-flex flex-column justify-content-center align-items-center"
+                 style="min-height: 100vh; background-color: #000;">
+                <!-- Imagen del stream -->
+                <img id="screen"
+                     src="/frames/last.jpg"
+                     alt="Captura de pantalla remota"
+                     class="img-fluid"
+                     style="max-width: 100%; max-height: 90vh; object-fit: contain; display: none;" />
+
+                <!-- Panel de estado con icono -->
+                <div class="position-absolute bottom-0 start-0 end-0 p-3 bg-dark bg-opacity-75">
+                    <div class="progress mb-2" style="height: 6px;">
+                        <div id="connectionProgress" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+                    </div>
+                    <small id="statusText" class="text-white-50">
+                        <i class="fas fa-info-circle me-2"></i><span>Esperando conexión...</span>
+                    </small>
+                </div>
+            </div>
+
+            <!-- Resize handle (solo visible en modo PIP) -->
+            <div class="resize-handle d-none position-absolute bottom-0 end-0" style="width: 20px; height: 20px; cursor: nwse-resize;">
+                <i class="fas fa-arrows-alt-h" style="position: absolute; right: 0; bottom: 0;"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Toastify para notificaciones -->
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+
+<!-- Modal para ver resultados -->
+<div class="modal fade" id="resultsModal" tabindex="-1" role="dialog" aria-labelledby="resultsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="resultsModalLabel">
+                    <i class="fa fa-list-alt"></i> Resultados de Comandos - <span id="modalMachineName"></span>
+                </h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Comando</th>
+                                <th>Estado</th>
+                                <th>Fecha</th>
+                                <th>Resultado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsTableBody">
+                            <!-- Aquí se cargarán los resultados -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container float-end" style=" margin-top: 100px; ">
+    <div id="commandToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="background: linear-gradient(135deg, rgba(26, 26, 46, 0.6) 0%, rgba(22, 33, 62, 0.6) 50%, rgba(15, 52, 96, 0.6) 100%);">
+        <div class="toast-header">
+            <i class="fa fa-info-circle me-2"></i>
+            <strong class="me-auto">Sistema</strong>
+            <small class="text-muted">Ahora</small>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+        </div>
+        <div class="toast-body">
+            Comando enviado correctamente
+        </div>
+    </div>
+</div>
+
+<style>
+ 
+    /* Aplicar a todas las imágenes */
+    img {
+        transition: all 0.3s ease;
+        border-radius: 4px; /* Opcional: bordes redondeados */
+        box-sizing: border-box; /* Mantiene dimensiones con padding */
+    }
+
+        /* Efecto al pasar el mouse */
+        img:hover {
+            transform: scale(1.05); /* Zoom del 5% */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Sombra opcional */
+        }
+
+    th,
+    td {
+        padding: 8px 10px;
+    }
+
+        th[scope="col"] {
+        }
+
+        th[scope="row"] {
+        }
+
+    td {
+        text-align: center;
+    }
+
+    tr:nth-of-type(even) {
+    }
+
+    table {
+        border-collapse: collapse;
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+    }
+
+    caption {
+        caption-side: bottom;
+        padding: 10px;
+    }
+
+    .table-responsive {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .table th,
+    .table td {
+        vertical-align: middle;
+    }
+
+    .flag-icon {
+        margin-right: 5px;
+        border-radius: 3px;
+        box-shadow: 0 0 3px rgba(0,0,0,0.3);
+    }
+
+    /* Para la bandera "unknown" */
+    .flag-icon-background {
+        background-size: contain;
+        background-position: 50%;
+        background-repeat: no-repeat;
+    }
+
+    .flag-icon-unknown {
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480"><rect width="640" height="480" fill="#eee"/><path fill="#0057b8" d="M0 0h640v480H0z"/><path fill="#ffd700" d="M0 0h640v320H0z"/></svg>');
+    }
+
+    /* Colores personalizados */
+    .fa-windows {
+        color: #0078d7;
+    }
+    /* Azul de Windows */
+    .fa-linux {
+        color: #000;
+    }
+    /* Negro de Linux */
+    .fa-apple {
+        color: #a2aaad;
+    }
+    /* Gris de Apple */
+    .fa-android {
+        color: #3ddc84;
+    }
+    /* Verde de Android */
+    .fa-shield-virus {
+        color: #ff0000;
+    }
+    /* Rojo para Avast */
+    .fa-biohazard {
+        color: #6b8e23;
+    }
+    /* Verde militar para Kaspersky */
+
+    .modal-dialog {
+        margin: auto; /* Centra el modal verticalmente */
+    }
+
+    .modal-cmd {
+        max-width: 800px; /* Ajusta el ancho máximo según sea necesario */
+        width: 1200px; /* Asegura que el modal use el 100% del ancho disponible */
+        margin-top: 50px;
+    }
+
+    .cmd-modal-content {
+        @* background-color: #1e1e1e; *@
+               <!-- background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), /* Reduje la opacidad de 0.7 a 0.3 */
+        url('/img/GIRL/Goku.png') center/contain no-repeat; -->
+        color: #f0f0f0;
+        border-radius: 0;
+        box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+
+    .cmd-header {
+        @* background-color: #2a2a2a; *@
+        border-bottom: 1px solid #000;
+        padding: 10px 15px;
+        background: linear-gradient(135deg, rgba(26, 26, 46, 0.6) 0%, /* Reduje la opacidad */
+        rgba(22, 33, 62, 0.6) 50%, rgba(15, 52, 96, 0.6) 100%);
+    }
+
+    .cmd-body {
+        padding: 10px;
+        font-family: 'Consolas', 'Courier New', monospace;
+        height: 400px;
+        overflow-y: auto;
+    }
+
+    .cmd-history {
+        margin-bottom: 10px;
+        min-height: 340px;
+        white-space: pre-wrap;
+        word-break: break-all;
+    }
+
+    .cmd-input-container {
+        display: flex;
+        align-items: center;
+        border-top: 1px solid #333;
+        padding-top: 10px;
+    }
+
+    .cmd-prompt {
+        color: #4caf50;
+        margin-right: 5px;
+        font-weight: bold;
+    }
+
+
+    .cmd-input {
+        flex-grow: 1;
+        background-color: #2a2a2a;
+        border: 1px solid #333;
+        color: #f0f0f0;
+        padding: 5px;
+        font-family: 'Consolas', 'Courier New', monospace;
+    }
+
+        .cmd-input:focus {
+            outline: none;
+            border-color: #4caf50;
+        }
+
+    .cmd-footer {
+        background-color: #2a2a2a;
+        border-top: 1px solid #000;
+        padding: 5px 15px;
+    }
+
+    .cmd-response {
+        color: #9cdcfe;
+    }
+
+    .cmd-error {
+        color: #f48771;
+    }
+
+    .cmd-command {
+        color: #4ec9b0;
+    }
+
+    /* Estilo para la barra de progreso */
+    .progress {
+        margin-top: 15px;
+        height: 20px;
+    }
+
+    .progress-bar {
+        line-height: 20px;
+        font-size: 12px;
+    }
+
+    /* Estilo para los botones de acciones */
+    .btn-xs {
+        margin-bottom: 2px;
+    }
+
+    /* Estilos para el File Manager */
+    .file-manager-container {
+        height: 400px;
+        overflow-y: auto;
+    }
+
+    .file-manager-breadcrumb {
+        margin-bottom: 10px;
+    }
+
+    .file-manager-content {
+        height: calc(100% - 40px);
+        overflow-y: auto;
+    }
+
+    #fileManagerTable {
+        font-size: 12px;
+    }
+
+        #fileManagerTable th {
+            background-color: #f5f5f5;
+            position: sticky;
+            top: 0;
+        }
+
+    .file-entry {
+        cursor: pointer;
+    }
+
+        .file-entry:hover {
+            background-color: #f0f0f0;
+        }
+
+    .file-icon {
+        margin-right: 5px;
+    }
+
+    .file-size {
+        text-align: right;
+    }
+
+    .file-date {
+        white-space: nowrap;
+    }
+
+    /* Estilos para los botones de navegación */
+    #btnBack, #btnForward {
+        width: 40px;
+    }
+
+    /* Estilo para el input de ruta actual */
+    #currentPath {
+        background-color: white;
+        cursor: default;
+    }
+
+    /* Estilo para botones deshabilitados */
+    .btn-default[disabled] {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .stream-error {
+        color: red;
+        text-align: center;
+        margin-top: 20px;
+        font-size: 16px;
+    }
+    
+    .loading {
+        background: url('/img/loading.gif') center center no-repeat;
+        background-size: 50px 50px;
+    }
+
+    /* Estilos para el menú contextual */
+    .context-menu {
+        display: none;
+        position: absolute;
+        background-color: #343a40;
+        border-radius: 4px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        min-width: 150px;
+        z-index: 1000;
+    }
+
+    .context-menu.show {
+        display: block;
+    }
+
+    .context-menu-item {
+        padding: 8px 12px;
+        color: #fff;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        position: relative;
+    }
+
+    .context-menu-item:hover {
+        background-color: #495057;
+    }
+
+    .context-menu-item i {
+        width: 16px;
+        text-align: center;
+    }
+
+    /* Estilos para el submenú */
+    .submenu {
+        display: none;
+        position: absolute;
+        left: 100%;
+        top: 0;
+        background-color: #343a40;
+        border-radius: 4px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        min-width: 150px;
+    }
+
+    .context-menu-item:hover > .submenu {
+        display: block;
+    }
+
+    .submenu-item {
+        padding: 8px 12px;
+        color: #fff;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .submenu-item:hover {
+        background-color: #495057;
+    }
+
+    /* Estilos para el checkbox */
+    .checkbox-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .client-checkbox {
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+    }
+
+
+
+    /* Estilos personalizados para los botones con iconos */
+    .btn-streaming {
+        background: linear-gradient(135deg, rgba(26, 26, 46, 0.7) 0%, rgba(22, 33, 62, 0.7) 50%, rgba(15, 52, 96, 0.7) 100%);
+        border: none;
+        color: white;
+        padding: 0.6rem 1.2rem;
+        border-radius: 0.75rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+    }
+
+        .btn-streaming:hover {
+            background: linear-gradient(135deg, rgba(36, 36, 56, 0.9) 0%, rgba(32, 43, 72, 0.9) 50%, rgba(25, 62, 106, 0.9) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+        }
+
+        .btn-streaming i {
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-streaming:hover i {
+            transform: scale(1.1);
+        }
+
+    /* Botón de inicio específico */
+    #startMonitorBtn {
+        background: linear-gradient(135deg, rgba(40, 167, 69, 0.8) 0%, rgba(25, 135, 84, 0.8) 50%, rgba(20, 110, 69, 0.8) 100%);
+    }
+
+        #startMonitorBtn:hover {
+            background: linear-gradient(135deg, rgba(50, 177, 79, 0.9) 0%, rgba(35, 145, 94, 0.9) 50%, rgba(30, 120, 79, 0.9) 100%);
+        }
+
+    /* Botón de detener específico */
+    #stopMonitorBtn {
+        background: linear-gradient(135deg, rgba(220, 53, 69, 0.8) 0%, rgba(200, 35, 51, 0.8) 50%, rgba(180, 20, 40, 0.8) 100%);
+    }
+
+        #stopMonitorBtn:hover {
+            background: linear-gradient(135deg, rgba(230, 63, 79, 0.9) 0%, rgba(210, 45, 61, 0.9) 50%, rgba(190, 30, 50, 0.9) 100%);
+        }
+
+    /* Badge de estado */
+    .status-badge {
+        background: linear-gradient(135deg, rgba(108, 117, 125, 0.7) 0%, rgba(73, 80, 87, 0.7) 50%, rgba(52, 58, 64, 0.7) 100%);
+        color: white;
+        padding: 0.6rem 1.2rem;
+        border-radius: 0.75rem;
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+        .status-badge i {
+            font-size: 0.8rem;
+        }
+
+        /* Estado activo con animación */
+        .status-badge.bg-success {
+            background: linear-gradient(135deg, rgba(40, 167, 69, 0.8) 0%, rgba(25, 135, 84, 0.8) 50%, rgba(20, 110, 69, 0.8) 100%) !important;
+            animation: pulse 2s infinite;
+        }
+
+    keyframes pulse {
+        0%
+
+    {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+    }
+
+    }
+
+    /* Efecto para el texto de los botones en pantallas pequeñas */
+    media (max-width: 768px) {
+        .btn-text
+
+    {
+        display: none;
+    }
+
+    .btn-streaming i {
+        margin-right: 0;
+        font-size: 1.4rem;
+    }
+
+    .status-badge span {
+        display: none;
+    }
+
+    }
+
+    /* Estilos para el modal en modo PIP */
+    .modal-pip {
+        position: fixed !important;
+        width: 600px;
+        height: 400px;
+        min-width: 300px;
+        min-height: 200px;
+        max-width: 90vw;
+        max-height: 90vh;
+        margin: 0 !important;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        z-index: 1060;
+        resize: none;
+        overflow: hidden;
+    }
+
+        .modal-pip .modal-content {
+            height: 100%;
+            min-height: auto;
+        }
+
+        .modal-pip .modal-body {
+            height: calc(100% - 60px);
+            overflow: hidden;
+        }
+
+        .modal-pip #screen {
+            max-height: 100% !important;
+        }
+
+    /* Estilos para el cursor al arrastrar */
+    .dragging {
+        cursor: move !important;
+        user-select: none;
+    }
+
+    /* Estilo para el resize handle */
+    .resize-handle i {
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .resize-handle:hover i {
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    /* Estilos para el monitor decorativo */
+    .monitor-container {
+        display: flex;
+        justify-content: center;
+        perspective: 1000px;
+    }
+
+    .monitor {
+        width: 300px;
+        height: 200px;
+        position: relative;
+        transform-style: preserve-3d;
+        transform: rotateX(10deg);
+    }
+
+    .monitor-screen {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(26, 26, 46, 0.8) 0%, rgba(22, 33, 62, 0.8) 50%, rgba(15, 52, 96, 0.8) 100%);
+        border: 15px solid #2a2a2a;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        position: relative;
+        overflow: hidden;
+        padding: 5px;
+    }
+
+    .screen-content {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #fff;
+        text-align: center;
+        padding: 0;
+        overflow: hidden;
+        background-color: #000;
+    }
+
+    .monitor-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+        border-radius: 5px;
+    }
+
+    .monitor-image:hover {
+        transform: scale(1.02);
+    }
+
+    .monitor-stand {
+        position: absolute;
+        bottom: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 30px;
+    }
+
+    .monitor-base {
+        width: 100%;
+        height: 100%;
+        background: #2a2a2a;
+        border-radius: 5px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+</style>
+
+
+@section Scripts {
+    <script>
+        $(function () {
+            var currentClientId = null;
+            var cmdModal = $('#cmdModal');
+            var cmdInput = $('#cmdInput');
+            var cmdHistory = $('#cmdHistory');
+
+            // Abrir modal de comandos (delegated)
+            $(document).on('click', '.open-cmd-modal', function() {
+                currentClientId = $(this).data('client-id');
+                var machineName = $(this).data('machine-name');
+
+                $('#cmdMachineName').text(machineName);
+                cmdHistory.empty();
+                cmdInput.val('');
+
+                cmdModal.modal('show');
+
+                // Agregar mensaje inicial
+                addToHistory('Sistema Remoto de Administración\nEscribe HELP para ver comandos disponibles\n');
+
+                // Enfocar el input
+                setTimeout(function() {
+                    cmdInput.focus();
+                }, 500);
+            });
+
+            // Manejar teclas en el input de comandos
+            cmdInput.keydown(function(e) {
+                if (e.key === 'Enter') {
+                    var command = cmdInput.val().trim();
+
+                    if (command) {
+                        executeCommand(command);
+                    }
+
+                    cmdInput.val('');
+                } else if (e.key === 'Escape') {
+                    cmdModal.modal('hide');
+                }
+            });
+
+            // Ejecutar comando
+            function executeCommand(command) {
+                addToHistory('C:\\>' + command, 'cmd-command');
+
+                if (command.toLowerCase() === 'help' || command === '?') {
+                    showHelp();
+                    return;
+                }
+
+                if (command.toLowerCase() === 'clear') {
+                    cmdHistory.empty();
+                    return;
+                }
+
+                $.post('@Url.Action("SendCommand", "Clients")',
+                    { clientId: currentClientId, command: command },
+                    function(response) {
+                        if (response.success) {
+                            addToHistory("Comando enviado. Esperando resultados...", 'cmd-response');
+                            monitorCommandResult(response.commandId);
+                        } else {
+                            addToHistory('Error: ' + response.message, 'cmd-error');
+                        }
+                    })
+                    .fail(function() {
+                        addToHistory('Error de conexión con el servidor', 'cmd-error');
+                    });
+            }
+
+            // Monitorear resultado del comando
+            function monitorCommandResult(commandId) {
+                var checkInterval = setInterval(function() {
+                    $.get('@Url.Action("GetCommandResults", "Clients")',
+                        { clientId: currentClientId },
+                        function(response) {
+                            if (response.success) {
+                                var result = response.results.find(function(r) {
+                                    return r.commandId === commandId;
+                                });
+
+                                if (result) {
+                                    clearInterval(checkInterval);
+                                    var resultClass = result.isError ? 'cmd-error' : 'cmd-response';
+                                    addToHistory(result.result, resultClass);
+                                }
+                            }
+                        });
+                }, 1000);
+            }
+
+            // Mostrar ayuda
+            function showHelp() {
+                var helpText = [
+                    '\nCOMANDOS DISPONIBLES:',
+                    'HELP       - Muestra esta ayuda',
+                    'CLEAR      - Limpia la pantalla',
+                    'DIR        - Lista directorios',
+                    'IPCONFIG   - Muestra configuración de red',
+                    'TASKLIST   - Lista procesos en ejecución',
+                    'NETSTAT    - Muestra conexiones de red',
+                    'SYSTEMINFO - Información del sistema\n',
+                    'SCREEN-CAP - Toma una captura de pantalla del cliente'
+                ].join('\n');
+
+                addToHistory(helpText, 'cmd-response');
+            }
+
+            // Agregar texto al historial
+            function addToHistory(text, cssClass) {
+                var div = $('<div>').addClass(cssClass || '').text(text);
+                cmdHistory.append(div);
+                cmdHistory.scrollTop(cmdHistory[0].scrollHeight);
+            }
+
+            // Ver resultados (modal) (delegated)
+            $(document).on('click', '.view-results', function () {
+                var clientId = $(this).data('client-id');
+                var machineName = $(this).data('machine-name');
+
+                $('#modalMachineName').text(machineName);
+                var modal = $('#resultsModal');
+                var resultsBody = $('#resultsTableBody');
+
+                // Mostrar loading
+                resultsBody.html('<tr><td colspan="4" class="text-center"><i class="fa fa-spinner fa-spin"></i> Cargando resultados...</td></tr>');
+                modal.modal('show');
+
+                $.get('@Url.Action("GetCommandResults", "Clients")',
+                    { clientId: clientId },
+                    function (response) {
+                        if (response.success) {
+                            resultsBody.empty();
+
+                            if (response.results.length === 0) {
+                                resultsBody.html('<tr><td colspan="4" class="text-center">No hay resultados disponibles</td></tr>');
+                                return;
+                            }
+
+                            // Ordenar por fecha descendente
+                            var sortedResults = response.results.sort(function(a, b) {
+                                return new Date(b.receivedTime) - new Date(a.receivedTime);
+                            });
+
+                            // Agregar cada resultado a la tabla
+                            sortedResults.forEach(function(item) {
+                                var row = $('<tr>');
+                                row.append($('<td>').text(item.command));
+                                row.append($('<td>').html(
+                                    item.isError ? 
+                                    '<span class="badge bg-danger">Error</span>' : 
+                                    '<span class="badge bg-success">Éxito</span>'
+                                ));
+                                row.append($('<td>').text(formatDate(item.receivedTime)));
+                                row.append($('<td>').html('<pre class="result-pre">' + escapeHtml(item.result) + '</pre>'));
+                                resultsBody.append(row);
+                            });
+                        } else {
+                            resultsBody.html('<tr><td colspan="4" class="text-center text-danger">Error al cargar resultados: ' + response.message + '</td></tr>');
+                        }
+                    })
+                    .fail(function() {
+                        resultsBody.html('<tr><td colspan="4" class="text-center text-danger">Error al conectar con el servidor</td></tr>');
+                    });
+            });
+
+            // Función para formatear fecha
+            function formatDate(dateString) {
+                if (!dateString) return 'N/A';
+                var date = new Date(dateString);
+                return date.toLocaleString();
+            }
+
+            // Función para escapar HTML
+            function escapeHtml(unsafe) {
+                if (!unsafe) return '';
+                return unsafe
+                    .toString()
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;")
+                    .replace(/\n/g, "<br>");
+            }
+
+            // Actualizar pantalla cada 10 segundos
+            setInterval(function() {
+                $('.screenshot-img').each(function() {
+                    var img = $(this);
+                    var src = img.attr('src').split('?')[0];
+                    img.attr('src', src + '?' + new Date().getTime());
+                });
+            }, 10000);
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const screenshotImages = document.querySelectorAll('.screenshot-img');
+            const modalImage = document.getElementById('fullScreenshot');
+
+            screenshotImages.forEach(img => {
+                img.addEventListener('click', function () {
+                    const fullSrc = this.getAttribute('data-fullsrc');
+                    modalImage.setAttribute('src', fullSrc);
+                    $('#screenshotModal').modal('show');
+                });
+            });
+
+            $('#screenshotModal').on('hidden.bs.modal', function () {
+                modalImage.setAttribute('src', '');
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $('.btn-danger').on('click', function () {
+                $('#cmdModal').modal('hide'); // Cierra el modal
+            });
+        });
+    </script>
+
+    <script>
+                // Manejar clic en el botón de transferencia
+        $(document).on('click', '.transfer-file', function() {
+            var clientId = $(this).data('client-id');
+            var machineName = $(this).data('machine-name');
+
+            $('#fileTransferMachineName').text(machineName);
+            $('#fileToTransfer').val('');
+            $('#uploadProgress').hide();
+            $('#fileTransferModal').data('client-id', clientId).modal('show');
+        });
+
+        // Manejar el envío del archivo
+        $('#btnStartTransfer').click(function() {
+            var clientId = $('#fileTransferModal').data('client-id');
+            var fileInput = document.getElementById('fileToTransfer');
+
+            if (fileInput.files.length === 0) {
+                alert('Por favor seleccione un archivo');
+                return;
+            }
+
+            var formData = new FormData();
+            formData.append('clientId', clientId);
+            formData.append('file', fileInput.files[0]);
+
+            $('#uploadProgress').show();
+
+            $.ajax({
+                url: '@Url.Action("UploadFileForClient", "Clients")',
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                xhr: function() {
+                    var xhr = new window.XMLHttpRequest();
+                    xhr.upload.addEventListener("progress", function(evt) {
+                        if (evt.lengthComputable) {
+                            var percentComplete = (evt.loaded / evt.total) * 100;
+                            $('#uploadProgress .progress-bar').css('width', percentComplete + '%');
+                            $('#uploadProgress .sr-only').text(percentComplete.toFixed(0) + '% completado');
+                        }
+                    }, false);
+                    return xhr;
+                },
+                success: function(response) {
+                    if (response.success) {
+                        alert('Archivo enviado correctamente: ' + response.message);
+                        $('#fileTransferModal').modal('hide');
+                    } else {
+                        alert('Error: ' + response.message);
+                    }
+                },
+                error: function() {
+                    alert('Error al comunicarse con el servidor');
+                },
+                complete: function() {
+                    $('#uploadProgress').hide();
+                }
+            });
+        });
+    </script>
+
+    <script>
+               // File Manager functionality
+        $(function () {
+            var currentFileManagerClientId = null;
+            var currentPath = "C:\\";
+            var currentCommandId = null;
+
+            // Abrir modal del File Manager
+            $('body').on('click', '.open-file-manager', function() {
+                currentFileManagerClientId = $(this).data('client-id');
+                var machineName = $(this).data('machine-name');
+
+                $('#fileManagerMachineName').text(machineName);
+                $('#fileManagerModal').modal('show');
+                currentPath = "C:\\";
+                $('#currentPath').val(currentPath);
+
+                // Cargar el directorio raíz
+                loadDirectory(currentFileManagerClientId, currentPath);
+            });
+
+            // Refrescar directorio actual
+            $('#btnRefresh').click(function() {
+                if (currentFileManagerClientId) {
+                    loadDirectory(currentFileManagerClientId, currentPath);
+                }
+            });
+
+            // Navegar por el breadcrumb
+            $('#fileManagerBreadcrumb').on('click', 'a', function(e) {
+                e.preventDefault();
+                var path = $(this).data('path');
+                currentPath = path;
+                $('#currentPath').val(currentPath);
+                loadDirectory(currentFileManagerClientId, currentPath);
+            });
+
+            // Navegar al hacer clic en un directorio
+            $('#fileManagerTableBody').on('click', '.directory-entry', function() {
+                var path = $(this).data('path');
+                currentPath = path;
+                $('#currentPath').val(currentPath);
+                loadDirectory(currentFileManagerClientId, currentPath);
+            });
+
+            // Función para cargar un directorio
+            function loadDirectory(clientId, path) {
+                $('#fileManagerTableBody').html('<tr><td colspan="5" class="text-center"><i class="fa fa-spinner fa-spin"></i> Cargando...</td></tr>');
+
+                $.post('@Url.Action("GetFileSystemEntries", "Clients")',
+                    { machineName: '', ipAddress: '', path: path, clientId: clientId },
+                    function(response) {
+                        if (response.success) {
+                            currentCommandId = response.commandId;
+                            monitorFileSystemEntries(clientId, response.commandId, path);
+                        } else {
+                            $('#fileManagerTableBody').html('<tr><td colspan="5" class="text-danger">Error: ' + response.message + '</td></tr>');
+                        }
+                    }
+                ).fail(function() {
+                    $('#fileManagerTableBody').html('<tr><td colspan="5" class="text-danger">Error de conexión con el servidor</td></tr>');
+                });
+            }
+
+            // Monitorear resultados del listado de directorios
+            function monitorFileSystemEntries(clientId, commandId, path) {
+                var checkInterval = setInterval(function() {
+                    $.get('@Url.Action("GetCommandResults", "Clients")',
+                        { clientId: clientId },
+                        function(response) {
+                            if (response.success) {
+                                var result = response.results.find(function(r) {
+                                    return r.commandId === commandId;
+                                });
+
+                                if (result && !result.isError) {
+                                    clearInterval(checkInterval);
+                                    updateFileManagerUI(result.result, path);
+                                } else if (result && result.isError) {
+                                    clearInterval(checkInterval);
+                                    $('#fileManagerTableBody').html('<tr><td colspan="5" class="text-danger">Error: ' + result.result + '</td></tr>');
+                                }
+                            }
+                        }
+                    );
+                }, 1000);
+            }
+
+            // Actualizar la interfaz con los resultados
+            function updateFileManagerUI(result, path) {
+                try {
+                    var entries = JSON.parse(result);
+                    var tableBody = $('#fileManagerTableBody');
+                    tableBody.empty();
+
+                    if (entries.length === 0) {
+                        tableBody.append('<tr><td colspan="5" class="text-center">El directorio está vacío</td></tr>');
+                        return;
+                    }
+
+                    // Actualizar breadcrumb
+                    updateBreadcrumb(path);
+
+                    // Agregar cada entrada
+                    entries.forEach(function(entry) {
+                        var row = $('<tr>');
+                        row.addClass(entry.Type === 'directory' ? 'directory-entry' : 'file-entry');
+                        row.data('path', entry.Path);
+
+                        // Nombre
+                        var nameCell = $('<td>');
+                        var icon = $('<i>').addClass('fa ' + (entry.Type === 'directory' ? 'fa-folder' : 'fa-file'));
+                        nameCell.append(icon).append(' ' + entry.Name);
+
+                        // Tipo
+                        var typeCell = $('<td>').text(entry.Type === 'directory' ? 'Directorio' : 'Archivo');
+
+                        // Tamaño
+                        var sizeCell = $('<td>').addClass('file-size');
+                        if (entry.Type === 'file') {
+                            sizeCell.text(formatFileSize(entry.Size));
+                        }
+
+                        // Fecha
+                        var dateCell = $('<td>').addClass('file-date').text(entry.LastModified);
+
+                        // Acciones
+                        var actionsCell = $('<td>');
+                        if (entry.Type === 'file') {
+                            actionsCell.append(
+                                $('<button>').addClass('btn btn-xs btn-primary download-file').html('<i class="fa fa-download"></i>')
+                            );
+                        }
+
+                        row.append(nameCell, typeCell, sizeCell, dateCell, actionsCell);
+                        tableBody.append(row);
+                    });
+                } catch (e) {
+                    $('#fileManagerTableBody').html('<tr><td colspan="5" class="text-danger">Error al procesar resultados: ' + e.message + '</td></tr>');
+                }
+            }
+
+            // Actualizar breadcrumb
+            function updateBreadcrumb(path) {
+                var breadcrumb = $('#fileManagerBreadcrumb');
+                breadcrumb.empty();
+
+                var parts = path.split('\\');
+                var currentPath = '';
+
+                for (var i = 0; i < parts.length; i++) {
+                    if (parts[i] === '') continue;
+
+                    currentPath += parts[i] + '\\';
+                    var isLast = (i === parts.length - 1);
+
+                    var item = $('<li>');
+                    if (isLast) {
+                        item.addClass('active').text(parts[i]);
+                    } else {
+                        item.append(
+                            $('<a>').attr('href', '#').data('path', currentPath).text(parts[i])
+                        );
+                    }
+
+                    breadcrumb.append(item);
+                }
+            }
+
+            // Formatear tamaño de archivo
+            function formatFileSize(bytes) {
+                if (bytes < 1024) return bytes + ' B';
+                if (bytes < 1048576) return (bytes / 1024).toFixed(2) + ' KB';
+                if (bytes < 1073741824) return (bytes / 1048576).toFixed(2) + ' MB';
+                return (bytes / 1073741824).toFixed(2) + ' GB';
+            }
+
+
+
+            // En el script del file manager, modifica el manejador de descarga:
+        $('#fileManagerTableBody').on('click', '.download-file', function(e) {
+            e.stopPropagation();
+            var row = $(this).closest('tr');
+            var filePath = row.data('path');
+            var fileName = filePath.split('\\').pop();
+
+            // Mostrar mensaje de espera
+            $('#fileManagerTableBody').html('<tr><td colspan="5" class="text-center"><i class="fa fa-spinner fa-spin"></i> Preparando descarga de ' + fileName + '...</td></tr>');
+
+            // Solicitar la descarga al servidor
+            $.post('@Url.Action("RequestFileDownload", "Clients")',
+                { clientId: currentFileManagerClientId, filePath: filePath },
+                function(response) {
+                    if (response.success) {
+                        // Monitorear el resultado del comando
+                        monitorDownloadResult(response.commandId, fileName);
+                    } else {
+                        $('#fileManagerTableBody').html('<tr><td colspan="5" class="text-danger">Error: ' + response.message + '</td></tr>');
+                    }
+                }
+            ).fail(function() {
+                $('#fileManagerTableBody').html('<tr><td colspan="5" class="text-danger">Error de conexión con el servidor</td></tr>');
+            });
+        });
+
+        // Función para monitorear el resultado de la descarga
+        function monitorDownloadResult(commandId, fileName) {
+            var checkInterval = setInterval(function() {
+                $.get('@Url.Action("GetCommandResults", "Clients")',
+                    { clientId: currentFileManagerClientId },
+                    function(response) {
+                        if (response.success) {
+                            var result = response.results.find(function(r) {
+                                return r.commandId === commandId;
+                            });
+
+                            if (result) {
+                                clearInterval(checkInterval);
+
+                                if (result.isError) {
+                                    $('#fileManagerTableBody').html('<tr><td colspan="5" class="text-danger">Error: ' + result.result + '</td></tr>');
+                                } else {
+                                    // Redirigir para descargar el archivo
+                                    window.location.href = '@Url.Action("DownloadFileFromClient", "Clients")?commandId=' + commandId;
+
+                                    // Recargar el directorio actual
+                                    loadDirectory(currentFileManagerClientId, currentPath);
+                                }
+                            }
+                        }
+                    }
+                );
+            }, 1000);
+        }
+
+
+        });
+    </script>
+
+    @* <script> *@
+    @*     $(document).ready(function() { *@
+    @*         var isStreaming = false; *@
+    @*         var currentStreamInterval = null; *@
+    @*         var lastFrameNumber = 0; *@
+    @*         var retryCount = 0; *@
+    @*         var maxRetries = 3; *@
+    @*         var frameQueue = []; *@
+    @*         var frameDisplayInterval = null; *@
+
+    @*         // Manejar inicio de streaming *@
+    @*         $('.start-stream').click(function() { *@
+    @*             var clientId = $(this).data('client-id'); *@
+    @*             var machineName = $(this).data('machine-name'); *@
+                
+    @*             console.log('Iniciando streaming para:', machineName, clientId); *@
+    @*             $('#streamModal').modal('show'); *@
+    @*             startStreaming(machineName, clientId); *@
+    @*         }); *@
+
+    @*         // Función para iniciar streaming *@
+    @*         function startStreaming(machineName, clientId) { *@
+    @*             if (isStreaming) return; *@
+                
+    @*             console.log('Iniciando streaming...'); *@
+    @*             isStreaming = true; *@
+    @*             lastFrameNumber = 0; *@
+    @*             retryCount = 0; *@
+    @*             frameQueue = []; *@
+    @*             $('#streamImage').attr('src', '').addClass(''); *@
+                
+    @*             // Enviar comando para iniciar streaming *@
+    @*             $.post('@Url.Action("SendCommand", "Clients")', { *@
+    @*                 clientId: clientId, *@
+    @*                 command: 'VNC-START-SCREEN' *@
+    @*             }, function(response) { *@
+    @*                 if (response.success) { *@
+    @*                     console.log('Comando VNC-START-SCREEN enviado correctamente'); *@
+    @*                     // Iniciar actualización de frames *@
+    @*                     updateStream(machineName, clientId); *@
+    @*                     // Iniciar visualización de frames *@
+    @*                     startFrameDisplay(); *@
+    @*                 } else { *@
+    @*                     console.error('Error al iniciar streaming:', response.message); *@
+    @*                     showStreamError('Error al iniciar streaming: ' + response.message); *@
+    @*                 } *@
+    @*             }).fail(function(xhr, status, error) { *@
+    @*                 console.error('Error de conexión:', error); *@
+    @*                 showStreamError('Error de conexión con el servidor: ' + error); *@
+    @*             }); *@
+
+    @*             // Detener streaming al cerrar el modal *@
+    @*             $('#streamModal').on('hidden.bs.modal', function() { *@
+    @*                 console.log('Modal cerrado, deteniendo streaming...'); *@
+    @*                 stopStreaming(clientId); *@
+    @*             }); *@
+    @*         } *@
+
+    @*         // Función para detener streaming *@
+    @*         function stopStreaming(clientId) { *@
+    @*             if (!isStreaming) return; *@
+                
+    @*             isStreaming = false; *@
+    @*             if (currentStreamInterval) { *@
+    @*                 clearTimeout(currentStreamInterval); *@
+    @*                 currentStreamInterval = null; *@
+    @*             } *@
+    @*             if (frameDisplayInterval) { *@
+    @*                 clearInterval(frameDisplayInterval); *@
+    @*                 frameDisplayInterval = null; *@
+    @*             } *@
+    @*             frameQueue = []; *@
+                
+    @*             $.post('@Url.Action("SendCommand", "Clients")', { *@
+    @*                 clientId: clientId, *@
+    @*                 command: 'VNC-STOP-SCREEN' *@
+    @*             }, function(response) { *@
+    @*                 console.log('Streaming detenido'); *@
+    @*             }).fail(function(xhr, status, error) { *@
+    @*                 console.error('Error al detener streaming:', error); *@
+    @*             }); *@
+    @*         } *@
+
+    @*         // Función para actualizar el stream *@
+    @*         function updateStream(machineName, clientId) { *@
+    @*             if (!isStreaming || !$('#streamModal').is(':visible')) return; *@
+
+    @*             console.log('Actualizando stream...'); *@
+    @*             $.get('@Url.Action("GetScreenStream", "Clients")', { *@
+    @*                 machineName: machineName, *@
+    @*                 ipAddress: clientId *@
+    @*             }, function(response) { *@
+    @*                 if (response.success) { *@
+    @*                     if (response.frames && response.frames.length > 0) { *@
+    @*                         console.log(`Recibidos ${response.frames.length} frames`); *@
+    @*                         // Agregar nuevos frames a la cola *@
+    @*                         response.frames.forEach(frame => { *@
+    @*                             if (frame.FrameNumber > lastFrameNumber) { *@
+    @*                                 frameQueue.push(frame); *@
+    @*                                 lastFrameNumber = frame.FrameNumber; *@
+    @*                                 console.log(`Frame ${frame.FrameNumber} agregado a la cola, tamaño: ${frame.ImageData.length} bytes`); *@
+    @*                             } *@
+    @*                         }); *@
+    @*                         retryCount = 0; // Resetear contador de reintentos *@
+    @*                     } else { *@
+    @*                         console.log('No hay frames disponibles'); *@
+    @*                     } *@
+    @*                 } else { *@
+    @*                     console.error('Error al obtener frames:', response.message); *@
+    @*                     if (retryCount < maxRetries) { *@
+    @*                         retryCount++; *@
+    @*                         console.log(`Reintentando... (${retryCount}/${maxRetries})`); *@
+    @*                     } else { *@
+    @*                         showStreamError('Error al obtener frames: ' + response.message); *@
+    @*                     } *@
+    @*                 } *@
+                    
+    @*                 // Actualizar cada 33ms (30 FPS) *@
+    @*                 currentStreamInterval = setTimeout(function() { *@
+    @*                     updateStream(machineName, clientId); *@
+    @*                 }, 33); *@
+    @*             }).fail(function(xhr, status, error) { *@
+    @*                 console.error('Error de conexión:', error); *@
+    @*                 if (retryCount < maxRetries) { *@
+    @*                     retryCount++; *@
+    @*                     console.log(`Reintentando... (${retryCount}/${maxRetries})`); *@
+    @*                     setTimeout(function() { *@
+    @*                         updateStream(machineName, clientId); *@
+    @*                     }, 1000); *@
+    @*                 } else { *@
+    @*                     showStreamError('Error de conexión con el servidor: ' + error); *@
+    @*                 } *@
+    @*             }); *@
+    @*         } *@
+
+    @*         // Función para iniciar la visualización de frames *@
+    @*         function startFrameDisplay() { *@
+    @*             if (frameDisplayInterval) { *@
+    @*                 clearInterval(frameDisplayInterval); *@
+    @*             } *@
+                
+    @*             console.log('Iniciando visualización de frames...'); *@
+    @*             frameDisplayInterval = setInterval(function() { *@
+    @*                 if (frameQueue.length > 0) { *@
+    @*                     var frame = frameQueue.shift(); *@
+    @*                     console.log(`Mostrando frame: ${frame.FrameNumber}, tamaño: ${frame.ImageData.length} bytes`); *@
+                        
+    @*                     // Verificar que el frame tiene datos *@
+    @*                     if (frame.ImageData) { *@
+    @*                         var imgSrc = 'data:image/jpeg;base64,' + frame.ImageData; *@
+                            
+    @*                         // Crear una nueva imagen para precargar *@
+    @*                         var img = new Image(); *@
+    @*                         img.onload = function() { *@
+    @*                             console.log('Imagen cargada correctamente'); *@
+    @*                             $('#streamImage') *@
+    @*                                 .attr('src', imgSrc) *@
+    @*                                 .removeClass('loading') *@
+    @*                                 .css('display', 'block'); *@
+    @*                         }; *@
+    @*                         img.onerror = function() { *@
+    @*                             console.error('Error al cargar la imagen'); *@
+    @*                         }; *@
+    @*                         img.src = imgSrc; *@
+    @*                     } else { *@
+    @*                         console.error('Frame sin datos de imagen'); *@
+    @*                     } *@
+    @*                 } *@
+    @*             }, 33); // Mostrar a 30 FPS *@
+    @*         } *@
+
+    @*         // Función para mostrar errores *@
+    @*         function showStreamError(message) { *@
+    @*             console.error('Error en streaming:', message); *@
+    @*             $('#streamImage') *@
+    @*                 .attr('src', '') *@
+    @*                 .removeClass('loading') *@
+    @*                 .after('<div class="stream-error">' + message + '</div>'); *@
+    @*         } *@
+    @*     }); *@
+    @* </script> *@
+
+
+
+
+
+    <script>
+        // Variables de estado
+        let isMonitoring = false;
+        let refreshInterval;
+        let statusCheckInterval;
+        let modalOpen = false;
+        let isPipMode = false;
+        let isDragging = false;
+        let isResizing = false;
+        let startX, startY, startWidth, startHeight, startLeft, startTop;
+        let modalInstance = null;
+
+        // Elementos del DOM
+        const screenElement = document.getElementById("screen");
+        const startBtn = document.getElementById("startMonitorBtn");
+        const stopBtn = document.getElementById("stopMonitorBtn");
+        const statusIndicator = document.getElementById("statusIndicator");
+        const statusText = document.getElementById("statusText");
+        const connectionProgress = document.getElementById("connectionProgress");
+        const monitorModal = document.getElementById('monitorModal');
+        const modalContent = document.querySelector('.modal-content');
+        const pipButton = document.getElementById('pipButton');
+        const resizeButton = document.getElementById('resizeButton');
+        const resizeHandle = document.querySelector('.resize-handle');
+        const draggableModal = document.getElementById('draggableModal');
+        const draggableHandle = document.querySelector('.draggable-handle');
+
+        // Función para actualizar la imagen
+        function updateScreen() {
+            if (!modalOpen) return;
+
+            const timestamp = new Date().getTime();
+            screenElement.src = `/frames/last.jpg?${timestamp}`;
+
+            screenElement.onerror = () => {
+                statusText.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i><span>Error al cargar la imagen</span>`;
+                connectionProgress.classList.remove("bg-success");
+                connectionProgress.classList.add("bg-warning");
+                screenElement.style.display = 'none';
+            };
+
+            screenElement.onload = () => {
+                statusText.innerHTML = `<i class="fas fa-clock me-2"></i><span>Última actualización: ${new Date().toLocaleTimeString()}</span>`;
+                connectionProgress.classList.remove("bg-warning");
+                connectionProgress.classList.add("bg-success");
+                screenElement.style.display = 'block';
+            };
+        }
+
+        // Función para verificar el estado del monitor
+        async function checkMonitorStatus() {
+            try {
+                const response = await fetch("/api/monitor-status");
+                if (response.ok) {
+                    const data = await response.json();
+
+                    if (data.isActive) {
+                        statusIndicator.className = "status-badge bg-success";
+                        statusIndicator.innerHTML = `<i class="fas fa-circle me-2"></i><span>Activo</span>`;
+                        connectionProgress.style.width = "100%";
+
+                        if (!isMonitoring && modalOpen) {
+                            startMonitoring();
+                        }
+                    } else {
+                        statusIndicator.className = "status-badge";
+                        statusIndicator.innerHTML = `<i class="fas fa-circle-notch fa-spin me-2"></i><span>Inactivo</span>`;
+                        connectionProgress.style.width = "0%";
+
+                        if (isMonitoring) {
+                            stopMonitoring();
+                        }
+                    }
+
+                    if (data.inactiveSeconds > 30) {
+                        statusText.innerHTML = `<i class="fas fa-exclamation me-2"></i><span>Cliente inactivo por ${Math.floor(data.inactiveSeconds)} segundos</span>`;
+                        connectionProgress.classList.remove("bg-success");
+                        connectionProgress.classList.add("bg-warning");
+                    }
+                }
+            } catch (error) {
+                console.error("Error checking status:", error);
+                statusIndicator.className = "status-badge bg-danger";
+                statusIndicator.innerHTML = `<i class="fas fa-times-circle me-2"></i><span>Error de conexión</span>`;
+                connectionProgress.style.width = "0%";
+                connectionProgress.classList.remove("bg-success", "bg-warning");
+            }
+        }
+
+        // Iniciar monitoreo
+        function startMonitoring() {
+            isMonitoring = true;
+            startBtn.disabled = true;
+            stopBtn.disabled = false;
+            statusIndicator.innerHTML = `<i class="fas fa-sync-alt fa-spin me-2"></i><span>Conectando...</span>`;
+
+            refreshInterval = setInterval(updateScreen, 1000);
+            updateScreen();
+
+            Toastify({
+                text: "Monitoreo iniciado correctamente",
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
+                icon: "fas fa-check-circle"
+            }).showToast();
+        }
+
+        // Detener monitoreo
+        function stopMonitoring() {
+            isMonitoring = false;
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            screenElement.style.display = 'none';
+            statusIndicator.innerHTML = `<i class="fas fa-power-off me-2"></i><span>Detenido</span>`;
+
+            clearInterval(refreshInterval);
+
+            Toastify({
+                text: "Monitoreo detenido",
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
+                icon: "fas fa-stop-circle"
+            }).showToast();
+        }
+
+        // Función para activar/desactivar modo Picture-in-Picture
+        function togglePipMode() {
+            const modalDialog = document.querySelector('.modal-dialog');
+
+            if (!isPipMode) {
+                // Activar modo PIP
+                modalDialog.classList.add('modal-pip');
+                pipButton.innerHTML = '<i class="fas fa-compress"></i>';
+                resizeButton.classList.remove('d-none');
+                resizeHandle.classList.remove('d-none');
+
+                // Posicionar en la esquina inferior derecha
+                modalDialog.style.left = 'auto';
+                modalDialog.style.right = '20px';
+                modalDialog.style.top = 'auto';
+                modalDialog.style.bottom = '20px';
+
+                isPipMode = true;
+            } else {
+                // Desactivar modo PIP
+                modalDialog.classList.remove('modal-pip');
+                pipButton.innerHTML = '<i class="fas fa-expand"></i>';
+                resizeButton.classList.add('d-none');
+                resizeHandle.classList.add('d-none');
+
+                // Restaurar posición
+                modalDialog.style.left = '';
+                modalDialog.style.right = '';
+                modalDialog.style.top = '';
+                modalDialog.style.bottom = '';
+
+                isPipMode = false;
+            }
+        }
+
+        // Función para manejar el inicio del arrastre
+        function startDrag(e) {
+            if (!isPipMode) return;
+
+            e.preventDefault();
+            isDragging = true;
+
+            const modalDialog = document.querySelector('.modal-dialog');
+            startX = e.clientX;
+            startY = e.clientY;
+            startLeft = parseInt(window.getComputedStyle(modalDialog).left, 10) || 0;
+            startTop = parseInt(window.getComputedStyle(modalDialog).top, 10) || 0;
+
+            document.body.classList.add('dragging');
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', stopDrag);
+        }
+
+        // Función para arrastrar
+        function drag(e) {
+            if (!isDragging) return;
+
+            const modalDialog = document.querySelector('.modal-dialog');
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+
+            modalDialog.style.left = `${startLeft + dx}px`;
+            modalDialog.style.top = `${startTop + dy}px`;
+        }
+
+        // Función para detener el arrastre
+        function stopDrag() {
+            isDragging = false;
+            document.body.classList.remove('dragging');
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('mouseup', stopDrag);
+        }
+
+        // Función para manejar el inicio del redimensionamiento
+        function startResize(e) {
+            if (!isPipMode) return;
+
+            e.preventDefault();
+            isResizing = true;
+
+            const modalDialog = document.querySelector('.modal-dialog');
+            startX = e.clientX;
+            startY = e.clientY;
+            startWidth = parseInt(document.defaultView.getComputedStyle(modalDialog).width, 10);
+            startHeight = parseInt(document.defaultView.getComputedStyle(modalDialog).height, 10);
+
+            document.addEventListener('mousemove', resize);
+            document.addEventListener('mouseup', stopResize);
+        }
+
+        // Función para redimensionar
+        function resize(e) {
+            if (!isResizing) return;
+
+            const modalDialog = document.querySelector('.modal-dialog');
+            const width = startWidth + (e.clientX - startX);
+            const height = startHeight + (e.clientY - startY);
+
+            // Aplicar límites mínimos y máximos
+            const minWidth = 300;
+            const minHeight = 200;
+            const maxWidth = window.innerWidth * 0.9;
+            const maxHeight = window.innerHeight * 0.9;
+
+            modalDialog.style.width = `${Math.min(maxWidth, Math.max(minWidth, width))}px`;
+            modalDialog.style.height = `${Math.min(maxHeight, Math.max(minHeight, height))}px`;
+        }
+
+        // Función para detener el redimensionamiento
+        function stopResize() {
+            isResizing = false;
+            document.removeEventListener('mousemove', resize);
+            document.removeEventListener('mouseup', stopResize);
+        }
+
+        // Event Listeners
+        startBtn.addEventListener("click", async () => {
+            try {
+                const response = await fetch("/api/start-monitor", {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    Toastify({
+                        text: "Error al iniciar el monitor",
+                        duration: 3000,
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        backgroundColor: "linear-gradient(to right, #ff416c, #ff4b2b)",
+                        icon: "fas fa-exclamation-triangle"
+                    }).showToast();
+                }
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        });
+
+        stopBtn.addEventListener("click", async () => {
+            try {
+                const response = await fetch("/api/stop-monitor", {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    console.error("Error al detener el monitor");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        });
+
+        // Controlar eventos del modal
+        monitorModal.addEventListener('show.bs.modal', function () {
+            modalOpen = true;
+            checkMonitorStatus();
+        });
+
+        monitorModal.addEventListener('hide.bs.modal', function () {
+            modalOpen = false;
+            clearInterval(refreshInterval);
+
+            // Si está en modo PIP, volver al modo normal al cerrar
+            if (isPipMode) {
+                togglePipMode();
+            }
+        });
+
+        // Eventos para PIP y arrastre
+        pipButton.addEventListener('click', togglePipMode);
+        draggableHandle.addEventListener('mousedown', startDrag);
+        resizeButton.addEventListener('click', function() {
+            // Alternar entre tamaño predefinido y personalizado
+            const modalDialog = document.querySelector('.modal-dialog');
+            if (modalDialog.style.width) {
+                modalDialog.style.width = '';
+                modalDialog.style.height = '';
+            } else {
+                modalDialog.style.width = '800px';
+                modalDialog.style.height = '600px';
+            }
+        });
+        resizeHandle.addEventListener('mousedown', startResize);
+
+        // Inicialización del modal con configuración para no cerrar al hacer click fuera
+        document.addEventListener("DOMContentLoaded", () => {
+            // Inicializar el modal con las opciones de backdrop static y keyboard false
+            const modal = new bootstrap.Modal(monitorModal, {
+                backdrop: 'static',
+                keyboard: false
+            });
+
+            // Mostrar el modal cuando se hace click en el botón (manejado por data attributes)
+
+            statusCheckInterval = setInterval(() => {
+                if (modalOpen) checkMonitorStatus();
+            }, 5000);
+        });
+    </script>
+
+
+
+    <script>
+        $(function () {
+            // Inicializar toasts
+            var toastEl = document.getElementById('commandToast');
+            var toast = new bootstrap.Toast(toastEl, {
+                delay: 3000
+            });
+
+            // Manejar clic en la imagen de la máquina
+            $('.machine-image').on('click', function(e) {
+                e.stopPropagation();
+                var clientId = $(this).data('client-id');
+                var menu = $('#context-menu-' + clientId);
+                
+                // Ocultar otros menús
+                $('.context-menu').not(menu).removeClass('show');
+                
+                // Mostrar menú contextual
+                menu.addClass('show');
+                // Posicionar el menú
+                var offset = $(this).offset();
+                menu.css({
+                    top: offset.top + $(this).outerHeight() + 5,
+                    left: offset.left
+                });
+            });
+
+            // Manejar clic en la imagen del antivirus
+            $('.antivirus-image').on('click', function(e) {
+                e.stopPropagation();
+                var clientId = $(this).data('client-id');
+                var menu = $('#antivirus-menu-' + clientId);
+                
+                // Ocultar otros menús
+                $('.context-menu').not(menu).removeClass('show');
+                
+                // Mostrar menú contextual
+                menu.addClass('show');
+                // Posicionar el menú
+                var offset = $(this).offset();
+                menu.css({
+                    top: offset.top + $(this).outerHeight() + 5,
+                    left: offset.left
+                });
+            });
+
+            // Manejar clic en opciones del menú de máquina
+            $('.context-menu-item').on('click', function(e) {
+                e.stopPropagation();
+                var command = $(this).data('command');
+                var clientId = $(this).closest('tr').data('client-id');
+                var commandName = $(this).text().trim();
+                
+                // Enviar comando al servidor
+                $.post('@Url.Action("SendCommand", "Clients")',
+                    { clientId: clientId, command: command },
+                    function(response) {
+                        if (response.success) {
+                            // Actualizar contenido del toast
+                            $('.toast-header i').removeClass().addClass('fa fa-check-circle me-2 text-success');
+                            $('.toast-body').text('Comando "' + commandName + '" enviado correctamente\nResultado: ' + response.result);
+                            toast.show();
+                        } else {
+                            // Actualizar contenido del toast para error
+                            $('.toast-header i').removeClass().addClass('fa fa-exclamation-circle me-2 text-danger');
+                            $('.toast-body').text('Error: ' + response.message);
+                            toast.show();
+                        }
+                    })
+                    .fail(function() {
+                        // Actualizar contenido del toast para error de conexión
+                        $('.toast-header i').removeClass().addClass('fa fa-exclamation-circle me-2 text-danger');
+                        $('.toast-body').text('Error de conexión con el servidor');
+                        toast.show();
+                    });
+
+                // Ocultar menú
+                $(this).closest('.context-menu').removeClass('show');
+            });
+
+            // Manejar clic en opciones del menú de antivirus
+            $('.context-menu-item, .submenu-item').on('click', function(e) {
+                e.stopPropagation();
+                var command = $(this).data('command');
+                var clientId = $(this).closest('tr').data('client-id');
+                var commandName = $(this).text().trim();
+                
+                // Enviar comando al servidor
+                $.post('@Url.Action("SendCommand", "Clients")',
+                    { clientId: clientId, command: command },
+                    function(response) {
+                        if (response.success) {
+                            // Actualizar contenido del toast
+                            $('.toast-header i').removeClass().addClass('fa fa-check-circle me-2 text-success');
+                            $('.toast-body').text('Comando "' + commandName + '" enviado correctamente\nResultado: ' + response.result);
+                            toast.show();
+                        } else {
+                            // Actualizar contenido del toast para error
+                            $('.toast-header i').removeClass().addClass('fa fa-exclamation-circle me-2 text-danger');
+                            $('.toast-body').text('Error: ' + response.message);
+                            toast.show();
+                        }
+                    })
+                    .fail(function() {
+                        // Actualizar contenido del toast para error de conexión
+                        $('.toast-header i').removeClass().addClass('fa fa-exclamation-circle me-2 text-danger');
+                        $('.toast-body').text('Error de conexión con el servidor');
+                        toast.show();
+                    });
+
+                // Ocultar menú
+                $(this).closest('.context-menu').removeClass('show');
+            });
+
+            // Cerrar menú al hacer clic fuera
+            $(document).on('click', function() {
+                $('.context-menu').removeClass('show');
+            });
+
+            // Manejar clic en la imagen de opciones
+            $('.options-image').on('click', function(e) {
+                e.stopPropagation();
+                var clientId = $(this).data('client-id');
+                var machineName = $(this).data('machine-name');
+                var menu = $('#options-menu-' + clientId);
+                
+                // Ocultar otros menús
+                $('.context-menu').not(menu).removeClass('show');
+                
+                // Mostrar menú contextual
+                menu.addClass('show');
+                // Posicionar el menú
+                var offset = $(this).offset();
+                menu.css({
+                    top: offset.top + $(this).outerHeight() + 5,
+                    left: offset.left
+                });
+            });
+
+            // Manejar clic en opciones del menú de opciones
+            $('.context-menu-item[data-action]').on('click', function(e) {
+                e.stopPropagation();
+                var action = $(this).data('action');
+                var clientId = $(this).closest('tr').data('client-id');
+                var machineName = $(this).closest('tr').find('.machine-image').data('machine-name');
+
+                switch(action) {
+                    case 'open-file-manager':
+                        $('#fileManagerMachineName').text(machineName);
+                        $('#fileManagerModal').data('client-id', clientId).modal('show');
+                        break;
+                    case 'open-file-transfer':
+                        $('#fileTransferMachineName').text(machineName);
+                        $('#fileToTransfer').val('');
+                        $('#uploadProgress').hide();
+                        $('#fileTransferModal').data('client-id', clientId).modal('show');
+                        break;
+                    case 'open-terminal':
+                        // Inicializar variables necesarias
+                        currentClientId = clientId;
+                        var cmdModal = $('#cmdModal');
+                        var cmdInput = $('#cmdInput');
+                        var cmdHistory = $('#cmdHistory');
+
+                        // Configurar el modal
+                        $('#cmdMachineName').text(machineName);
+                        cmdHistory.empty();
+                        cmdInput.val('');
+
+                        // Abrir modal de comandos
+                        cmdModal.modal('show');
+
+                        // Agregar mensaje inicial
+                        addToHistory('Sistema Remoto de Administración\nEscribe HELP para ver comandos disponibles\n');
+
+                        // Enfocar el input después de un breve retraso
+                        setTimeout(function() {
+                            cmdInput.focus();
+                        }, 500);
+
+                        // Manejar teclas en el input de comandos
+                        cmdInput.off('keydown').on('keydown', function(e) {
+                            if (e.key === 'Enter') {
+                                var command = cmdInput.val().trim();
+                                if (command) {
+                                    executeCommand(command);
+                                }
+                                cmdInput.val('');
+                            } else if (e.key === 'Escape') {
+                                cmdModal.modal('hide');
+                            }
+                        });
+                        break;
+                }
+
+                // Ocultar menú
+                $(this).closest('.context-menu').removeClass('show');
+            });
+        });
+    </script>
+
+    <script>
+        $(function () {
+            // Manejar clic en el botón de recarga
+            $('#reloadButton').click(function() {
+                location.reload();
+            });
+        });
+    </script>
+
+    <script>
+        $(function () {
+            // Actualizar imagen del monitor cuando se haga clic en una captura
+            $('.screenshot-img').on('click', function() {
+                var fullSrc = $(this).data('fullsrc');
+                $('#monitorScreenshot').attr('src', fullSrc);
+            });
+
+            // Actualizar imagen del monitor cada 10 segundos
+            setInterval(function() {
+                var currentSrc = $('#monitorScreenshot').attr('src');
+                if (currentSrc) {
+                    var newSrc = currentSrc.split('?')[0] + '?' + new Date().getTime();
+                    $('#monitorScreenshot').attr('src', newSrc);
+                }
+            }, 10000);
+
+            // ... existing code ...
+        });
+    </script>
+
+    <script>
+        $(function () {
+            // Manejar la ejecución del Builder
+            $('#executeBuilder').click(function() {
+                var solutionPath = $('#solutionPath').val();
+                var configuration = $('#configuration').val();
+                var platform = $('#platform').val();
+
+                // Mostrar indicador de carga
+                $('#executeBuilder').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Compilando...');
+
+                // Enviar comando al servidor
+                $.post('@Url.Action("SendCommand", "Clients")',
+                    {
+                        clientId: currentClientId,
+                        command: '@GetBuilderCommand("' + solutionPath + '", "' + configuration + '", "' + platform + '")'
+                    },
+                    function(response) {
+                        // Restaurar botón
+                        $('#executeBuilder').prop('disabled', false).html('<i class="fas fa-play me-2"></i>Ejecutar');
+
+                        if (response.success) {
+                            // Mostrar resultado de la compilación
+                            var resultMessage = response.result || "Compilación completada";
+                            
+                            // Crear modal para mostrar el resultado
+                            var resultModal = $('<div class="modal fade" id="buildResultModal" tabindex="-1">' +
+                                '<div class="modal-dialog modal-lg">' +
+                                '<div class="modal-content">' +
+                                '<div class="modal-header">' +
+                                '<h5 class="modal-title"><i class="fas fa-code me-2"></i>Resultado de la Compilación</h5>' +
+                                '<button type="button" class="btn-close" data-bs-dismiss="modal"></button>' +
+                                '</div>' +
+                                '<div class="modal-body">' +
+                                '<pre class="bg-dark text-light p-3 rounded">' + resultMessage + '</pre>' +
+                                '</div>' +
+                                '<div class="modal-footer">' +
+                                '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>' +
+                                '</div>' +
+                                '</div>' +
+                                '</div>' +
+                                '</div>');
+
+                            // Agregar modal al body y mostrarlo
+                            $('body').append(resultModal);
+                            var bsModal = new bootstrap.Modal(resultModal);
+                            bsModal.show();
+
+                            // Limpiar modal cuando se cierre
+                            resultModal.on('hidden.bs.modal', function () {
+                                resultModal.remove();
+                            });
+
+                            // Cerrar el modal del builder
+                            $('#builderModal').modal('hide');
+                        } else {
+                            // Mostrar notificación de error
+                            Toastify({
+                                text: "Error: " + response.message,
+                                duration: 3000,
+                                close: true,
+                                gravity: "top",
+                                position: "right",
+                                backgroundColor: "linear-gradient(to right, #ff416c, #ff4b2b)",
+                                icon: "fas fa-exclamation-triangle"
+                            }).showToast();
+                        }
+                    })
+                    .fail(function() {
+                        // Restaurar botón
+                        $('#executeBuilder').prop('disabled', false).html('<i class="fas fa-play me-2"></i>Ejecutar');
+
+                        // Mostrar notificación de error de conexión
+                        Toastify({
+                            text: "Error de conexión con el servidor",
+                            duration: 3000,
+                            close: true,
+                            gravity: "top",
+                            position: "right",
+                            backgroundColor: "linear-gradient(to right, #ff416c, #ff4b2b)",
+                            icon: "fas fa-exclamation-triangle"
+                        }).showToast();
+                    });
+            });
+        });
+    </script>
+}
